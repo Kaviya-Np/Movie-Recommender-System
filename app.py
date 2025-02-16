@@ -3,7 +3,17 @@ import streamlit as st
 import pickle
 import pandas as pd
 import requests
+import gzip
+import py7zr
+#import gdown
+import os
 
+
+
+#Google Drive File IDs
+#movies_dict_id = "1Aj5NYqHxOdsTyPICPBFo-rI_0Z8fdF3d"
+#similarity_id = "1LvCo6TuwkLG1Hk_WYlTFN9h315ZuvUnE"
+#KAGGLE_URL = ""
 
 def fetch_poster(movie_id):
     response = requests.get('https://api.themoviedb.org/3/movie/{}?api_key=3bb817c4c76ad683b0d62eafa2aba1d2'.format(movie_id))
@@ -30,17 +40,41 @@ def recommend(movie):
         recommended_movies_posters.append(fetch_poster(movie_id))
     return recommended_movies,recommended_movies_posters
 
+# Extract similarity.pkl if not already extracted
+if not os.path.exists("similarity.pkl"):
+    with py7zr.SevenZipFile("similarity.7z", mode="r") as archive:
+        archive.extractall()
+    print("Extracted similarity.pkl from similarity.7z")
+    
+# Decompress similarity.pkl.gz if not already extracted
+#if not os.path.exists("similarity.pkl"):
+ #   with gzip.open("similarity.pkl.gz", "rb") as f:
+  #      with open("similarity.pkl", "wb") as out_f:
+   #         out_f.write(f.read())
 
+# Load similarity.pkl
+similarity = pickle.load(open("similarity.pkl", "rb"))
 
+# Function to download files from Google Drive
+#def download_file(output):
+ #   if not os.path.exists(output):  # Download only if file is missing
+ #       os.system(f"wget {KAGGLE_URL} -O {output}")
+
+# Download both files
+#download_file(movies_dict_id, "movies_dict.pkl")
+#download_from_kaggle(similarity_id, "similarity.pkl")
+
+# Load the files normally
+movies_dict = pickle.load(open("movies_dict.pkl", "rb"))
+movies = pd.DataFrame(movies_dict)
+#similarity = pickle.load(open("similarity.pkl", "rb"))
 
 #movies_list_web = pickle.load(open('movies.pkl', 'rb'))
 #movies = movies_list_web['title'].values
 
-movies_dict = pickle.load(open('movies_dict.pkl', 'rb'))
-movies = pd.DataFrame(movies_dict)
 
-similarity = pickle.load(open('similarity.pkl', 'rb'))
-pickle.dump(similarity,open("similarity.pkl", "wb"))
+#similarity = pickle.load(open('similarity.pkl', 'rb'))
+#pickle.dump(similarity,open("similarity.pkl", "wb"))
 
 st.title('Movie Recommender System')  #In terminal give streamlit run app.py. It will open the title in webpage
 

@@ -4,9 +4,13 @@ import pickle
 import pandas as pd
 import requests
 import gzip
-import py7zr
-#import gdown
+import bz2
 import os
+
+
+#import py7zr
+#import gdown
+
 
 
 
@@ -40,25 +44,42 @@ def recommend(movie):
         recommended_movies_posters.append(fetch_poster(movie_id))
     return recommended_movies,recommended_movies_posters
 
-# Extract similarity.pkl if not already extracted
-if not os.path.exists("similarity.pkl"):
-    with py7zr.SevenZipFile("similarity.7z", mode="r") as archive:
-        archive.extractall()
-    print("Extracted similarity.pkl from similarity.7z")
-    
-# Decompress similarity.pkl.gz if not already extracted
-#if not os.path.exists("similarity.pkl"):
- #   with gzip.open("similarity.pkl.gz", "rb") as f:
-  #      with open("similarity.pkl", "wb") as out_f:
-   #         out_f.write(f.read())
+# Function to compress similarity.pkl to similarity.pkl.bz2
+def compress_pkl(input_file, output_file):
+    with open(input_file, "rb") as f:
+        data = pickle.load(f)
+
+    with bz2.BZ2File(output_file, "wb") as f:
+        pickle.dump(data, f)
+
+    print(f"Compression complete! Saved as {output_file}")
+
+# Function to decompress similarity.pkl.bz2 to similarity.pkl
+def decompress_pkl(compressed_file, output_file):
+    if not os.path.exists(output_file):  # Only extract if missing
+        with bz2.BZ2File(compressed_file, "rb") as f:
+            data = pickle.load(f)
+
+        with open(output_file, "wb") as f:
+            pickle.dump(data, f)
+
+        print(f"Decompression complete! Saved as {output_file}")
+    else:
+        print(f"{output_file} already exists. Skipping decompression.")
+
+# File paths
+compressed_file = "similarity.pkl.bz2"
+output_file = "similarity.pkl"
+
+# Decompress if needed
+decompress_pkl(compressed_file, output_file)
+
+# Load the decompressed similarity.pkl
+with open(output_file, "rb") as f:
+    similarity = pickle.load(f)
 
 # Load similarity.pkl
-similarity = pickle.load(open("similarity.pkl", "rb"))
-
-# Function to download files from Google Drive
-#def download_file(output):
- #   if not os.path.exists(output):  # Download only if file is missing
- #       os.system(f"wget {KAGGLE_URL} -O {output}")
+#similarity = pickle.load(open("similarity.pkl", "rb"))
 
 # Download both files
 #download_file(movies_dict_id, "movies_dict.pkl")

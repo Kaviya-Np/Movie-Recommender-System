@@ -3,10 +3,9 @@ requests
 pandas
 gdown
 pickles
-numpy
-scikit-learn
+scikit-learn==1.3.0
+numpy==1.24.3
 nltk
 gdown
 py7zr
 kaggle
-gzip

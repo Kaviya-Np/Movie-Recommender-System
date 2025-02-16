@@ -7,8 +7,6 @@ numpy
 scikit-learn
 nltk
 gdown
-os
+py7zr
 kaggle
 gzip
-py7zr
-py7zr
